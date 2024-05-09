@@ -1,5 +1,25 @@
+<?php
+
+
+
+
+$mpdf = new \Mpdf\Mpdf();
+
+//==============================================================
+
+$html = '
+<style>
+textarea {
+}
+input {
+}
+select {
+	font-family: Arial
+}
+</style>
+<body>
 <h2>Active Forms</h2>
-        
+
 <form action="formsubmit.php" method="post">
 <b>Input Text</b>
 <input type="text" size="90" name="inputfield" value="" title="The title attribute works like a tool-tip" />
@@ -23,6 +43,23 @@
 
 <b>Input Password</b>
 <input type="password" size="40" name="password" value="mysecretpassword" title="This field is set to act as a password field." >
+<br /><br />
+
+<b>Input Email</b>
+<input type="email" size="40" name="email"  title="This field is set to act as a email field." onChange="
+var emailField = this.getField(\'email\').value;
+
+var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  
+    
+    if (!emailPattern.test(`${emailField}`)) {
+        app.alert("Please enter a valid email address.", 0, 2); 
+    
+    }
+
+app.alert(`${b}`);
+
+">
 <br /><br />
 
 <b>Calculations</b>
@@ -107,19 +144,7 @@ this.getField(\'first_language_display\').value = choice;
 
 <br /><br />
 
-{{-- Click this button to see Javascript in action:
-<input type="image" name="imageButton" value="imagesubmitted" src="assets/goto.gif" title="Click to run javascript" onClick="
-var npass = this.getField(\'password\').value;
-app.alert(\'Value of password field is: \\\'\' + npass + \'\\\'\');
-var nButton = app.alert({
-cMsg: \'Do you want to change the input text field to: T\u00f6rkylempij\u00e4?\',
-cTitle: \'A message from A. C. Robat\',
-nIcon: 2, nType: 2
-});
-if ( nButton == 4 ) {
-this.getField(\'inputfield\').value = \'T\u00f6rkylempij\u00e4\';
-}
-" /> --}}
+
 
 <br /><br />
 
@@ -147,3 +172,53 @@ this.getField(\'inputfield\').value = \'T\u00f6rkylempij\u00e4\';
 
 
 </form>
+';
+
+
+
+//==============================================================
+$mpdf->useActiveForms = true;
+
+/*
+// Try playing around with these (these are also in config.php)
+$mpdf->formSubmitNoValueFields = true;
+
+$mpdf->formExportType = 'xfdf'; // 'html' or 'xfdf'
+$mpdf->formSelectDefaultOption = true;	// for Select drop down box; if no option is explicitly maked as selected,
+							// this determines whether to select 1st option (as per browser)
+							// - affects whether "required" attribute is relevant
+$mpdf->form_border_color = '0.0 0.820 0.0';
+$mpdf->form_background_color = '0.941 0.941 0.941';
+$mpdf->form_border_width = '1';
+$mpdf->form_border_style = 'S';
+
+$mpdf->form_radio_color = '0.0 0.820 0.0';
+$mpdf->form_radio_background_color = '0.941 0.5 0.5';
+
+$mpdf->form_button_border_color = '0.0 0.820 0.0';
+$mpdf->form_button_background_color = '0.941 0.941 0.941';
+$mpdf->form_button_border_width = '1';
+$mpdf->form_button_border_style = 'S';
+*/
+
+$mpdf->WriteHTML($html);
+
+//==============================================================
+// JAVASCRIPT FOR WHOLE DOCUMENT
+$mpdf->SetJS('
+var dialogTitle = "Enter details";
+var defaultAnswer = "";
+var reply = app.response("This is javascript set to run when the document opens. Enter value for first field", dialogTitle, defaultAnswer);
+if (reply != null) {
+this.getField("inputfield").value = reply;
+}
+');
+//==============================================================
+// OUTPUT
+$mpdf->Output(); exit;
+
+
+//==============================================================
+//==============================================================
+//==============================================================
+//======================================================
